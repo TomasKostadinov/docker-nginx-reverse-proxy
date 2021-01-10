@@ -1,0 +1,27 @@
+version: '2'
+services:
+  nginx-proxy:
+    container_name: nginx-proxy-container
+    image: 'jwilder/nginx-proxy:latest'
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DEFAULT_HOST: default.vhost
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+    networks:
+      - proxy-nety
+  # FOR TESTING ONLY
+  whoami:
+    container_name: whoami-container
+    networks:
+      - proxy-network
+    image: jwilder/whoami
+    environment:
+      - VIRTUAL_HOST=whoami.DOMAINHERE.com
+networks:
+# create new network
+  proxy-network:
+    driver: bridge
