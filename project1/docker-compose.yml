@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+  db:
+    container_name: database
+    restart: unless-stopped
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: POSTGRES_PASSWORD
+      POSTGRES_USER: POSTGRES_USER
+      POSTGRES_DB: POSTGRES_DB
+    volumes:
+      - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+    expose:
+      - "5432"
+    networks:
+    # important: Networks are prefixed with the folder name of the docker-compose.yml file which creates the network
+    # if the directory is the users home directory, it is called root_
+      - main_proxy-nety
+  web:
+    container_name: server
+    restart: unless-stopped
+    image: "node:10"
+    depends_on:
+      - db
+    # when "ports" is used this container will also be available outside docker - meaning that you cannot use "ports" and port 80, because it is being used bei nginx
+    expose:
+      - "80"
+    user: "node" # for ubuntu, use root
+    working_dir: /home/node/app
+    volumes:
+      - ./:/home/node/app
+    command: >
+      sh -c "npm install && npm start"
+    env_file:
+      - .env
+    environment:
+      VIRTUAL_HOST: project1.DOMAINHERE.com
+      #NODE_ENV: production
+      # the database's IP will be available through "db"
+      DATABASE_URL: "db"
+    networks:
+      - main_proxy-nety
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose
+networks:
+  # define the network as an external network (no need to create a new one)
+  main_proxy-nety:
+    external: true
