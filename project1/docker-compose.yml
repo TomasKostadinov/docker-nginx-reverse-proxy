@@ -22,7 +22,7 @@ services:
     image: "node:10"
     depends_on:
       - db
-    # when "ports" is used this container will also be available outside docker - meaning that you cannot use "ports" and port 80, because it is being used bei nginx
+    # when "ports" is used this container will also be available outside docker - meaning that you cannot use "ports" and port 80, because it is being used by nginx
     expose:
       - "80"
     user: "node" # for ubuntu, use root
